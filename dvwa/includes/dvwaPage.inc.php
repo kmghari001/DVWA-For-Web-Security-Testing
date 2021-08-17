@@ -11,35 +11,28 @@ if (!file_exists(DVWA_WEB_PAGE_TO_ROOT . 'config/config.inc.php')) {
 	die ("DVWA System error - config file not found. Copy config/config.inc.php.dist to config/config.inc.php and configure to your environment.");
 }
 
-/*
-This function can be called to decode GET, POST and REQUEST variables
-before they are used by any of the vulnerable functions.
-*/
-
-function decode_inputs() {
-	$newrequest = array();
-	foreach ($_REQUEST as $key => $value) {
-		$newrequest[$key] = base64_decode ($value);
-	}
-
-	$_REQUEST = $newrequest;
-	$newpost = array();
-	foreach ($_POST as $key => $value) {
-		$newpost[$key] = base64_decode ($value);
-	}
-
-	$_POST = $newpost;
-	$newget = array();
-	foreach ($_GET as $key => $value) {
-		$newget[$key] = base64_decode ($value);
-	}
-
-	$_GET = $newget;
-}
-
 // Include configs
 require_once DVWA_WEB_PAGE_TO_ROOT . 'config/config.inc.php';
 require_once( 'dvwaPhpIds.inc.php' );
+
+/*
+This pair of calls allows a custom decode script to be used to
+decode input values.
+
+This was written for Sullo (https://github.com/sullo), of Nikto fame, and
+can probably be ignored by most people. See README.decode.md for more
+details.
+*/
+
+if (file_exists(DVWA_WEB_PAGE_TO_ROOT . 'dvwa/includes/decode.php')) {
+	require_once (DVWA_WEB_PAGE_TO_ROOT . 'dvwa/includes/decode.php');
+}
+
+if (!function_exists (decode_inputs)) {
+	function decode_inputs() {
+		// Empty
+	}
+}
 
 // Declare the $html variable
 if( !isset( $html ) ) {
